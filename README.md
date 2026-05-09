@@ -60,12 +60,47 @@ ML-DSA support is also wired into the tree, but whether it works on your machine
 
 ## Build
 
-Build the daemon and admin CLI:
+After cloning the repository, build working binaries with the local wolfSSL
+wrapper:
+
+```bash
+git clone https://github.com/danielinux/xmppqr
+cd xmppqr
+./scripts/build-xmppqrd-local-wolfssl.sh
+```
+
+That produces `./xmppqrd`, `./xmppqrctl`, and `./x3dhpq-testclient` linked
+against a local static wolfSSL build.
+
+If your system wolfSSL has all required features available through
+`pkg-config wolfssl`, you can build directly against the system library:
 
 ```bash
 go build -o ./xmppqrd ./cmd/xmppqrd
 go build -o ./xmppqrctl ./cmd/xmppqrctl
+go build -o ./x3dhpq-testclient ./cmd/x3dhpq-testclient
 ```
+
+The default wolfSSL ref is `v5.9.1-stable`. You can override it with a
+positional argument:
+
+```bash
+./scripts/build-xmppqrd-local-wolfssl.sh v5.9.1-stable
+```
+
+or with the ignored root `.env` file:
+
+```bash
+XMPPQR_WOLFSSL_REF=v5.9.1-stable
+```
+
+The scripts download the selected wolfSSL tag archive into `.local/src`, install
+wolfSSL into `.local/wolfssl-<ref>` by default, for example
+`.local/wolfssl-v5.9.1-stable`, and run the Go builds with
+`PKG_CONFIG_LIBDIR` pointing at that local `wolfssl.pc`. Set
+`XMPPQR_WOLFSSL_PREFIX` in the shell or `.env` to override the install
+directory. Plain `go build` continues to use the system `pkg-config wolfssl`
+configuration.
 
 If you only want to check the admin CLI path:
 
